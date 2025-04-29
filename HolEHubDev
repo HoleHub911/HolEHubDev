@@ -1,0 +1,445 @@
+-- 🔹 ดึง HWID ของเครื่องผู้เล่น
+local function getHWID()
+	return game:GetService("RbxAnalyticsService"):GetClientId()  -- ใช้ Client ID แทน HWID
+end
+
+local playerHWID = getHWID()
+
+-- 🔹 ดึงข้อมูลจาก Pastebin (ใช้ request() สำหรับ Exploit)
+local pastebinURL = "https://pastebin.com/raw/36dRWV9g"  -- ใส่ลิงก์ Pastebin ของคุณ
+
+local success, response = pcall(function()
+	return request({ Url = pastebinURL, Method = "GET" })  -- ใช้ request() สำหรับ Exploit
+end)
+
+if not success then
+	game.Players.LocalPlayer:Kick("Error❌")
+	return
+end
+
+-- 🔹 ดาวน์โหลด Lua JSON parser (ถ้าไม่มีใน Exploit)
+local json = loadstring(game:HttpGet("https://raw.githubusercontent.com/rxi/json.lua/master/json.lua"))()
+
+-- 🔹 แปลงข้อมูลที่ได้จาก Pastebin เป็น Table
+local data = json.decode(response.Body)  -- ใช้ json.decode แทน HttpService:JSONDecode
+
+-- 🔹 ตรวจสอบ HWID และ Key
+if data[playerHWID] and _G.Key and data[playerHWID] == _G.Key then
+	local lib = loadstring(game:HttpGet"https://raw.githubusercontent.com/dawid-scripts/UI-Libs/main/Vape.txt")()
+
+	local win = lib:Window("HolEHub",Color3.fromRGB(44, 120, 224), Enum.KeyCode.RightControl)
+
+	local AimbotTab = win:Tab("ล็อคเป้า")
+	local TeleportTab = win:Tab("วาร์ปซื้ออาวุธ")
+	local InvisTab = win:Tab("ล่องหน")
+	local CombatTab = win:Tab("Combat")
+	local GunTab = win:Tab("Gun")
+	local ESPTab = win:Tab("มองทะลุ")
+	local MiscTab = win:Tab("Misc")
+
+	function bypasscooldown()
+		game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(
+			function(prompt)
+				prompt.HoldDuration = 0
+			end)
+	end
+
+	bypasscooldown()
+
+
+
+	local Players = game:GetService("Players")
+	local LocalPlayer = Players.LocalPlayer
+
+	local espTable = {}
+
+
+
+
+
+
+	CombatTab:Toggle("ตีทีเดียวตาย",false, function(t)
+		_G.OneShot = t
+		while _G.OneShot do
+			task.wait(0.1)
+
+			local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+			if tool and tool:FindFirstChild("MainModule") then
+				for _, settingModule in pairs(tool.MainModule:GetChildren()) do
+					local asdas = require(settingModule)
+					asdas.BaseDamage = {math.huge,math.huge}
+				end
+			end
+		end
+	end)
+
+
+	CombatTab:Toggle("ตีแรง(2-3ทีตาย)",false, function(t)
+		_G.Damage = t
+		while _G.Damage do
+			task.wait(0.1)
+
+			local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+			if tool and tool:FindFirstChild("MainModule") then
+				for _, settingModule in pairs(tool.MainModule:GetChildren()) do
+					local asdas = require(settingModule)
+					asdas.BaseDamage = {45,50}
+				end
+			end
+		end
+	end)
+
+	
+	CombatTab:Button("Hitbox", function()
+		_G.HeadSize = 20
+		_G.Disabled = true
+
+		game:GetService("RunService").RenderStepped:Connect(function()
+			if _G.Disabled then
+				for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+					if player.Name ~= game:GetService("Players").LocalPlayer.Name then
+						pcall(function()
+							local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+							if rootPart then
+								rootPart.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+								rootPart.Transparency = 0.7
+								rootPart.BrickColor = BrickColor.new("Really black")
+								rootPart.Material = Enum.Material.Neon
+								rootPart.CanCollide = false
+							end
+						end)
+					end
+				end
+			end
+		end)
+	end)
+
+
+	InvisTab:Button("ล่องหน", function()
+		local idk = game.Players.LocalPlayer
+		local args = {
+			[1] = "CreatePlayer",
+			[2] = workspace:WaitForChild(idk.Name)
+		}
+
+		workspace:WaitForChild("Models"):WaitForChild("2018 Honda PCX"):WaitForChild("2018 Honda PCX"):WaitForChild("Anims"):FireServer(unpack(args))
+
+	end)
+
+
+	GunTab:Textbox("ยิงแรงขึ้น",false, function(t)
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.BaseDamage = t
+	end)
+
+	GunTab:Button("กระสุนไม่จำกัด", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.LimitedAmmoEnabled = false
+		gun.AmmoPerMag = inf
+	end)
+	
+
+	GunTab:Button("ยิงออกหลายนัด (เหมือนลูกซอง/โบ๊ะ)", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.ShotgunEnabled = true
+		gun.BulletPerShot = 8
+		gun.ShotgunPump = false
+	end)
+
+	GunTab:Button("ยิงรัวขึ้น", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.FireRate = 0
+		gun.holdingTime = 0.001
+		gun.CooldownRate = 0.001
+		gun.CooldownTime = 0.001
+		gun.DelayBeforeFiring = 0.001
+		gun.DelayAfterFiring = 0.001
+	end)
+
+	GunTab:Toggle("ยิงรัวv2(เปิดยิงรัวตัวแรกก่อน)",false, function(t)
+		_G.enable = t
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+
+		if _G.enable then
+			gun.Auto = true
+		else
+			gun.Auto = false
+
+		end
+
+	end)
+
+	GunTab:Button("ยิงตายแล้วร่างเด้ง(มันจะเปิดให้อัตโนมัติถ้าเปิดแช่แข็งกับเผา)", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.Knockback = inf
+	end)
+
+
+	GunTab:Button("กระสุนระเบิด", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.ExplosiveEnabled = true
+		gun.ExplosionRadius = inf
+		gun.ExplosionKnockback = true
+		gun.ExplosionKnockbackPower = inf
+		gun.ExplosionKnockbackMultiplierOnPlayer = inf
+	end)
+
+	GunTab:Button("กระสุนหมอกลงแมพ", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.BulletHoleEnabled = true
+		gun.BulletHoleSize = 10000
+		gun.BulletHoleVisibleTime = 10000
+		gun.BulletShellEnabled = true
+	end)
+
+	GunTab:Button("กระสุนแช่แข็ง", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.Knockback = inf
+		gun.Lifesteal = inf
+		gun.FreezingBullet = true
+		gun.IcifyChance = inf
+	end)
+
+
+	GunTab:Button("กระสุนเผา", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+		gun.Knockback = inf
+		gun.Lifesteal = inf
+		gun.FlamingBullet = true
+		gun.IgniteChance = inf
+	end)
+	
+	GunTab:Button("ปิดแรงดีดปืน", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+
+	    gun.CameraRecoilingEnabled = false;
+	end)
+	
+	GunTab:Button("กระสุนยักษ์ (เกรียนคนทั้งแมพ)", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+		gun.BulletShellEnabled = true;
+		gun.BulletShellDelay = 0.1;
+		gun.BulletShellVelocity = 17;
+		gun.BulletShellRotVelocity = 40;
+		gun.ShellSize = Vector3.new(1093.995, 2048, 2048); --Scale the part
+		gun.AllowCollide = false; --If false, a bullet shell will go through any parts
+		gun.ShellScale = Vector3.new(1093.995, 2048, 2048); --Scale mesh
+		gun.ShellMeshID = 95392019; --(shotgun = 94248124, Pistol/Smgs = 95392019, Rifles = )
+		gun.ShellTextureID = 95391833; --(shotgun = 116456647, Pistol/Smgs = 95391833, Rifles = )
+		gun.DisappearTime = math.huge; --In second
+	end)
+	
+	GunTab:Button("แฟลชสว่างๆ (เกรียนคนทั้งแมพ)", function()
+		local gun = require(game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool").Setting)
+		local inf = math.huge
+		gun.MuzzleFlashEnabled = true;
+		gun.MuzzleLightEnabled = true;
+		gun.LightBrightness = 10000;
+		gun.LightColor = Color3.new(0.988235, 0.988235, 0.988235);
+		gun.LightRange = 100000000000000000000;
+		gun.LightShadows = true;
+		gun.VisibleTime = math.huge; --In second
+	end)
+	
+	
+		-----[ Teleport ]-----
+	local function Find(name)
+		for _,v in pairs(game.workspace:GetDescendants()) do
+			if v:IsA("Model") and v.Name == name then
+				print(name)
+				for _,u in pairs(v:GetDescendants()) do
+					if u.Name == "HumanoidRootPart" then
+						print('found hrp')
+						return u
+					end
+				end
+			
+			end
+		end
+	end
+
+	local function FindPromt(name)
+		for _,v in pairs(game.workspace:GetDescendants()) do
+			if v:IsA("Model") and v.Name == name then
+				for _,u in pairs(v:GetDescendants()) do
+					if u:IsA("ProximityPrompt") then
+						return u
+					end
+				end
+			end
+		end
+	end
+	local function Buy(name)
+		local olspos = game.Players.LocalPlayer.HumanoidRootPart.CFrame
+		warn('pressed')
+		local hrp = Find(name)
+		local promt = FindPromt(name)
+		game.Players.LocalPlayer.HumanoidRootPart.CFrame = hrp
+		fireproximityprompt(promt)
+		task.wait(1)
+		game.Players.LocalPlayer.HumanoidRootPart.CFrame = olspos
+	end
+	TeleportTab:Button("วาร์ปซื้อปืน Glock18", function()
+		Buy("G18")
+	end)
+	
+	
+
+
+
+
+	AimbotTab:Toggle("Aimbot", false, function(t)
+		getgenv().ExunysDeveloperAimbot = {
+			DeveloperSettings = {
+				UpdateMode = "RenderStepped",
+				TeamCheckOption = "TeamColor",
+				RainbowSpeed = 1 -- Bigger = Slower
+			},
+
+			Settings = {
+				Enabled = true,
+
+				TeamCheck = false,
+				AliveCheck = true,
+				WallCheck = true,
+
+				OffsetToMoveDirection = false, -- Prediction
+				OffsetIncrement = 15, -- Min: 1; Max: 30 -- Amplitude
+
+				Sensitivity = 0, -- Animation length (in seconds) before fully locking onto target / CFrame Sensitivity
+				Sensitivity2 = 3.5, -- mousemoverel Sensitivity
+
+				LockMode = 1, -- 1 = CFrame; 2 = mousemoverel
+				LockPart = "Head", -- Body part to lock on
+
+				TriggerKey = Enum.UserInputType.MouseButton2,
+				Toggle = false
+			},
+
+			FOVSettings = {
+				Enabled = true,
+				Visible = true,
+
+				Radius = 100, -- Field Of View
+				NumSides = 60,
+
+				Thickness = 1,
+				Transparency = 1,
+				Filled = false,
+
+				RainbowColor = false,
+				RainbowOutlineColor = false,
+				Color = Color3.fromRGB(255, 255, 255),
+				OutlineColor = Color3.fromRGB(0, 0, 0),
+				LockedColor = Color3.fromRGB(255, 150, 150)
+			}
+		}
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Aimbot-V3/main/src/Aimbot.lua"))()
+		ExunysDeveloperAimbot.Load()
+
+
+	end)
+
+
+
+
+	ESPTab:Toggle("ESP", false, function(t)
+		_G.ESP = t
+
+		while _G.ESP do
+			for _, player in ipairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer and player.Character then
+					if not espTable[player] then
+						local highlight = Instance.new("Highlight")
+						highlight.Parent = player.Character
+						highlight.FillTransparency = 0.5
+						highlight.OutlineTransparency = 0
+
+						-- เช็คทีม
+						if player.Team == LocalPlayer.Team then
+							highlight.FillColor = Color3.fromRGB(0, 255, 0) -- สีเขียว (เพื่อน)
+						else
+							highlight.FillColor = Color3.fromRGB(255, 0, 0) -- สีแดง (ศัตรู)
+						end
+
+						espTable[player] = highlight
+					end
+				end
+			end
+
+			wait(0.1) -- อัปเดต ESP ทุก 0.1 วินาที
+		end
+
+		-- ลบ ESP เมื่อปิดการทำงาน
+		for _, esp in pairs(espTable) do
+			if esp then
+				esp:Destroy()
+			end
+		end
+
+		espTable = {} -- เคลียร์ table
+	end)
+
+	MiscTab:Button("BoostFps", function()
+		for _, obj in ipairs(workspace:GetDescendants()) do
+			if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("ParticleEmitter") 
+				or obj:IsA("Fire") or obj:IsA("Smoke") or obj:IsA("Sparkles") then
+				obj:Destroy() -- ลบวัตถุที่ไม่จำเป็น
+			elseif obj:IsA("MeshPart") or obj:IsA("Part") then
+				obj.Material = Enum.Material.SmoothPlastic -- ลดรายละเอียดพื้นผิว
+				obj.Reflectance = 0 -- ปิดเงาสะท้อน
+				obj.CastShadow = false -- ปิด Shadows
+			end
+		end
+	end)
+
+
+	local ToggleGui = Instance.new("ScreenGui")
+	ToggleGui.Name = "ToggleUI"
+	ToggleGui.Parent = game:GetService("CoreGui")
+
+	local ToggleButton = Instance.new("TextButton")
+	ToggleButton.Parent = ToggleGui
+	ToggleButton.Size = UDim2.new(0, 100, 0, 40)
+	ToggleButton.Position = UDim2.new(0, 20, 0, 20)
+	ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	ToggleButton.Text = "Hide UI"
+	ToggleButton.BorderSizePixel = 0
+
+	local ui = game.CoreGui:FindFirstChild("ui") or game.Players.LocalPlayer.PlayerGui:FindFirstChild("ui")
+	local uiEnabled = true
+
+	ToggleButton.MouseButton1Click:Connect(function()
+		uiEnabled = not uiEnabled
+		ui.Enabled = uiEnabled
+		ToggleButton.Text = uiEnabled and "Hide UI" or "Show UI"
+		print("UI Toggled:", uiEnabled)
+	end)
+
+
+
+
+else
+	game.Players.LocalPlayer:Kick("HwidหรือKeyของคุณไม่ถูกต้อง❌")
+end
